@@ -237,16 +237,16 @@ function updateUnnamedMarkets()
 	$ltc_btc = $doge_btc = $eth = 0;
 
 	// prendo i prezzi delle basi iterando sulla risposta dell'exchange
-	foreach ($tickers as $data) {
-   		switch ($ticker["market"]) {
+	foreach ($data as $ticker) {
+   		switch ($ticker->market) {
         		case "LTC_BTC":
-            			$ltc_btc = $ticker["highestBuy"];
+            			$ltc_btc = $ticker->highestBuy;
             		break;
         		case "DOGE_BTC":
-            			$doge_btc = $ticker["highestBuy"];
+            			$doge_btc = $ticker->highestBuy;
             		break;
         		case "ETH_BTC":
-            			$eth_btc = $ticker["highestBuy"];
+            			$eth_btc = $ticker->highestBuy;
             		break;
     		}
 	}
@@ -273,7 +273,7 @@ function updateUnnamedMarkets()
 		}
 
 		foreach ($data as $ticker) {
-			$quoteAsset = explode('_', $ticker["market"])[0];
+			$quoteAsset = explode('_', $ticker->market)[0];
 			if ($ticker->market === $pair) {
 
 				if (!in_array($quoteAsset, $searched)) {
@@ -283,11 +283,11 @@ function updateUnnamedMarkets()
         				$maxTempQuoteAsset = '';
 			        	$buyValue = 0;
 
-				foreach ($tickers as $ticker2) {
+				foreach ($data as $ticker2) {
             			// ETH, LTC, DOGE..
-            			$baseAsset = explode('_', $ticker2["market"])[1];
+            			$baseAsset = explode('_', $ticker2->market)[1];
             			// CHECK IF IS ETH, LTC, DOGE AND CURRENT PAIR..
-            			$pos = stripos($ticker2["market"], $quoteAsset);
+            			$pos = stripos($ticker2->market, $quoteAsset);
             			if (
                 			$pos !== false &&
                 		(
@@ -298,20 +298,20 @@ function updateUnnamedMarkets()
                 		) {
                     			// converto il valore del buy in bitcoin
                     			if($baseAsset == 'DOGE')
-                        		  $buyValue = $ticker2["highestBuy"] * $doge_btc;
+                        		  $buyValue = $ticker2->highestBuy * $doge_btc;
                     			else if($baseAsset == 'LTC')
-                        		  $buyValue = $ticker2["highestBuy"] * $ltc_btc;
+                        		  $buyValue = $ticker2->highestBuy * $ltc_btc;
                     			else if($baseAsset == 'ETH')
-                        		  $buyValue = $ticker2["highestBuy"] * $eth_btc;
+                        		  $buyValue = $ticker2->highestBuy * $eth_btc;
 
                     if($buyValue > $maxTempValue) {
                         $maxTempValue = $buyValue;
                         $maxTempQuoteAsset = $baseAsset;
                     }
-                    echo $ticker2["market"] . " - " . $ticker2["highestBuy"] . "<br>";
+                    echo $ticker2->market . " - " . $ticker2->highestBuy . "<br>";
             }
 
-	debuglog(" HIGHEST VALUE OF " . $ticker['market'] . " IS " . $maxTempQuoteAsset);
+	debuglog(" HIGHEST VALUE OF " . $ticker->market . " IS " . $maxTempQuoteAsset);
 
 				if ($market->disabled < 9) {
 					$nbm = (int) dboscalar("SELECT COUNT(id) FROM markets WHERE coinid={$coin->id} $sqlFilter");
@@ -320,7 +320,7 @@ function updateUnnamedMarkets()
 
 				$price2 = $ticker->highestBuy;
 				// $price = $ticker->lowestSell;
-				$price = $ticker->$maxTempQuoteAsset;
+				$price = $maxTempQuoteAsset;
 				$market->price2 = $price2;
 				$market->price = $price;
 				$market->pricetime = time(); // $ticker->timestamp "2018-08-31T12:48:56Z"
@@ -335,6 +335,8 @@ function updateUnnamedMarkets()
 			}
 		}
 	}
+}
+}
 }
 
 function updateBleutradeMarkets()
