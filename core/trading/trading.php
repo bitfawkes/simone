@@ -160,6 +160,11 @@ function runExchange($exchangeName=false)
 				updatePoloniexMarkets();
 				break;
 
+                        case 'unnamed':
+                                // doPoloniexTrading(true);
+                                updateUnnamedMarkets();
+                                break;
+
 			default:
 				debuglog(__FUNCTION__.' '.$exchangeName.' not implemented');
 		}
